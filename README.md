@@ -1,17 +1,3 @@
----
-title: Elyssa - detects conflicting emotions
-emoji: 😊
-colorFrom: indigo
-colorTo: purple
-sdk: gradio
-sdk_version: 5.20.1
-app_file: app.py
-pinned: false
-license: mit
-models:
-- seasalt29/imageModelBig
-- seasalt29/model3
----
 
 # Elyssa - Emotion-Aware Mental Health Assistant
 
