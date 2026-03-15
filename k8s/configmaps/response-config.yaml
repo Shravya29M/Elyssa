@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: response-config
+  namespace: elyssa
+data:
+  MODEL_ID: "seasalt29/model3"
+  MAX_SEQ_LENGTH: "512"
+  MAX_NEW_TOKENS: "512"
+  LOG_LEVEL: "INFO"
+  HF_HOME: "/model-cache"

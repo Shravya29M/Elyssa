@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-config
+  namespace: elyssa
+data:
+  INFERENCE_SERVICE_URL: "http://inference-service.elyssa.svc.cluster.local:8001"
+  SENTIMENT_SERVICE_URL: "http://sentiment-service.elyssa.svc.cluster.local:8002"
+  RESPONSE_SERVICE_URL: "http://response-service.elyssa.svc.cluster.local:8003"
+  LOG_LEVEL: "INFO"
+  CIRCUIT_BREAKER_THRESHOLD: "5"
+  CIRCUIT_BREAKER_TIMEOUT: "30"

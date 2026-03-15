@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: inference-service
+  namespace: elyssa
+  labels:
+    app: inference-service
+spec:
+  selector:
+    app: inference-service
+  ports:
+    - protocol: TCP
+      port: 8001
+      targetPort: 8001
+  type: ClusterIP

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: elyssa
+data:
+  GATEWAY_URL: "http://gateway.elyssa.svc.cluster.local:8000"

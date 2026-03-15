@@ -1,0 +1,144 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/elyssa
+
+jobs:
+  lint-and-test:
+    name: Lint & Test — ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: inference-service
+            context: services/inference-service
+          - service: sentiment-service
+            context: services/sentiment-service
+          - service: response-service
+            context: services/response-service
+          - service: gateway
+            context: services/gateway
+          - service: frontend
+            context: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.service }}-${{ hashFiles(format('{0}/requirements.txt', matrix.context)) }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.service }}-
+
+      - name: Install dependencies
+        run: |
+          cd ${{ matrix.context }}
+          pip install -r requirements.txt
+          pip install ruff pytest pytest-asyncio httpx
+
+      - name: Lint with ruff
+        run: |
+          cd ${{ matrix.context }}
+          ruff check . --select E,F,W,I --ignore E501
+
+      - name: Run tests
+        if: matrix.service != 'frontend'
+        env:
+          MOCK_MODELS: "true"
+        run: |
+          cd ${{ matrix.context }}
+          python -m pytest tests/ -v --tb=short
+
+  build-and-push:
+    name: Build & Push — ${{ matrix.image }}
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: inference-service
+            context: services/inference-service
+            image: inference
+          - service: sentiment-service
+            context: services/sentiment-service
+            image: sentiment
+          - service: response-service
+            context: services/response-service
+            image: response
+          - service: gateway
+            context: services/gateway
+            image: gateway
+          - service: frontend
+            context: frontend
+            image: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.image }}
+          tags: |
+            type=sha,prefix=,suffix=,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push ${{ matrix.service }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  validate-k8s:
+    name: Validate Kubernetes Manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Validate manifests (dry-run)
+        run: |
+          kubectl apply --dry-run=client -f k8s/namespace.yaml
+          kubectl apply --dry-run=client -f k8s/configmaps/ -n elyssa
+          kubectl apply --dry-run=client -f k8s/deployments/ -n elyssa
+          kubectl apply --dry-run=client -f k8s/services/ -n elyssa
+          kubectl apply --dry-run=client -f k8s/hpa/ -n elyssa
+          kubectl apply --dry-run=client -f k8s/ingress/ -n elyssa
+          kubectl apply --dry-run=client -f k8s/storage/ -n elyssa

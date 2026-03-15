@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sentiment-config
+  namespace: elyssa
+data:
+  LOG_LEVEL: "INFO"
+  NLTK_DATA: "/nltk_data"

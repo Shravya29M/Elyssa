@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inference-config
+  namespace: elyssa
+data:
+  MODEL_ID: "seasalt29/imageModelBig"
+  LOAD_IN_4BIT: "true"
+  MAX_NEW_TOKENS: "128"
+  INFERENCE_TEMPERATURE: "0.1"
+  LOG_LEVEL: "INFO"
+  HF_HOME: "/model-cache"
