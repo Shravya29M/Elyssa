@@ -1,4 +1,3 @@
-import asyncio
 import pytest
 from app.circuit_breaker import CircuitBreaker, CircuitOpenError, CircuitState
 

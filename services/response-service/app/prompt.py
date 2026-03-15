@@ -30,7 +30,7 @@ def create_prompt(
         )
     else:
         instruction = (
-            f"Detected facial emotion: {facial_emotion}\n\n. "
+            f"Detected facial emotion: {facial_emotion}.\n\n"
             f"You are a helpful mental health counselling assistant that also considers the detected "
             f"facial emotion of the user, please answer the mental health questions based on the "
             f"patient's description. The assistant gives helpful, comprehensive, and appropriate "

@@ -41,14 +41,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.service }}-${{ hashFiles(format('{0}/requirements.txt', matrix.context)) }}
+          key: ${{ runner.os }}-pip-${{ matrix.service }}-${{ hashFiles(format('{0}/requirements-ci.txt', matrix.context), format('{0}/requirements.txt', matrix.context)) }}
           restore-keys: |
             ${{ runner.os }}-pip-${{ matrix.service }}-
 
       - name: Install dependencies
         run: |
           cd ${{ matrix.context }}
-          pip install -r requirements.txt
+          # Use requirements-ci.txt when present (skips GPU packages like unsloth/torch)
+          if [ -f requirements-ci.txt ]; then
+            pip install -r requirements-ci.txt
+          else
+            pip install -r requirements.txt
+          fi
           pip install ruff pytest pytest-asyncio httpx
 
       - name: Lint with ruff
@@ -130,15 +135,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v3
-
-      - name: Validate manifests (dry-run)
+      - name: Install kubeconform
         run: |
-          kubectl apply --dry-run=client -f k8s/namespace.yaml
-          kubectl apply --dry-run=client -f k8s/configmaps/ -n elyssa
-          kubectl apply --dry-run=client -f k8s/deployments/ -n elyssa
-          kubectl apply --dry-run=client -f k8s/services/ -n elyssa
-          kubectl apply --dry-run=client -f k8s/hpa/ -n elyssa
-          kubectl apply --dry-run=client -f k8s/ingress/ -n elyssa
-          kubectl apply --dry-run=client -f k8s/storage/ -n elyssa
+          curl -sSLo kubeconform.tar.gz \
+            https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
+          tar xf kubeconform.tar.gz
+          sudo mv kubeconform /usr/local/bin/
+
+      - name: Validate manifests
+        run: |
+          find k8s/ -name '*.yaml' | sort | xargs kubeconform \
+            -strict \
+            -summary \
+            -kubernetes-version 1.29.0

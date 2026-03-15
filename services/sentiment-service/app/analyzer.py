@@ -57,5 +57,4 @@ def detect_conflict(facial_emotion: str, text: str) -> dict:
         "text_emotion": text_emotion,
         "facial_category": facial_category,
         "text_category": text_category,
-        "compound_score": compound,
     }
