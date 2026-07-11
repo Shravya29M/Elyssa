@@ -3,6 +3,7 @@ import os
 os.environ["MOCK_MODELS"] = "true"
 
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 client = TestClient(app)

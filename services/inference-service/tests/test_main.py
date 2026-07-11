@@ -2,7 +2,6 @@ import base64
 import io
 import os
 
-import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 

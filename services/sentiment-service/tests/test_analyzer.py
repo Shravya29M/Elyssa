@@ -1,4 +1,3 @@
-import pytest
 from app.analyzer import analyze_text_sentiment, detect_conflict
 
 

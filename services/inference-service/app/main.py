@@ -1,19 +1,17 @@
 import base64
 import io
 import logging
-import os
 import time
 from contextlib import asynccontextmanager
 
 import structlog
-import torch
 from fastapi import FastAPI, HTTPException
 from PIL import Image
 from prometheus_client import generate_latest
 from starlette.responses import Response
 
 from .metrics import REQUEST_COUNT, REQUEST_LATENCY
-from .model import detect_emotion, is_model_loaded, load_vision_model
+from .model import detect_emotion, gpu_available, is_model_loaded, load_vision_model
 from .schemas import EmotionDetectRequest, EmotionDetectResponse, HealthResponse
 
 structlog.configure(
@@ -44,7 +42,7 @@ async def health():
         status="ok",
         service="inference-service",
         model_loaded=is_model_loaded(),
-        gpu_available=torch.cuda.is_available(),
+        gpu_available=gpu_available(),
     )
 
 
@@ -56,7 +54,7 @@ async def ready():
         status="ready",
         service="inference-service",
         model_loaded=True,
-        gpu_available=torch.cuda.is_available(),
+        gpu_available=gpu_available(),
     )
 
 

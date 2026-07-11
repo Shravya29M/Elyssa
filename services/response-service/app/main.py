@@ -3,13 +3,12 @@ import time
 from contextlib import asynccontextmanager
 
 import structlog
-import torch
 from fastapi import FastAPI, HTTPException
 from prometheus_client import generate_latest
 from starlette.responses import Response
 
 from .metrics import REQUEST_COUNT, REQUEST_LATENCY
-from .model import generate, is_model_loaded, load_language_model
+from .model import generate, gpu_available, is_model_loaded, load_language_model
 from .prompt import create_prompt, parse_response
 from .schemas import GenerateRequest, GenerateResponse, HealthResponse
 
@@ -41,7 +40,7 @@ async def health():
         status="ok",
         service="response-service",
         model_loaded=is_model_loaded(),
-        gpu_available=torch.cuda.is_available(),
+        gpu_available=gpu_available(),
     )
 
 
@@ -53,7 +52,7 @@ async def ready():
         status="ready",
         service="response-service",
         model_loaded=True,
-        gpu_available=torch.cuda.is_available(),
+        gpu_available=gpu_available(),
     )
 
 

@@ -4,27 +4,23 @@ import os
 
 import gradio as gr
 import httpx
-import numpy as np
 from PIL import Image
 
 GATEWAY_URL = os.getenv("GATEWAY_URL", "http://gateway:8000")
 
-# Global variable for storing the latest webcam frame
-last_frame = None
 
-
-def update_frame(frame):
-    global last_frame
+def update_frame(frame, last_frame):
+    """Keep the latest webcam frame in per-session state."""
     if frame is not None:
-        last_frame = frame.copy()
-    return None
+        return frame.copy()
+    return last_frame
 
 
-def _frame_to_b64() -> str | None:
-    """Convert the latest numpy frame to a base64-encoded JPEG string."""
-    if last_frame is None:
+def _frame_to_b64(frame) -> str | None:
+    """Convert a numpy frame to a base64-encoded JPEG string."""
+    if frame is None:
         return None
-    pil_img = Image.fromarray(last_frame)
+    pil_img = Image.fromarray(frame)
     buf = io.BytesIO()
     pil_img.save(buf, format="JPEG", quality=85)
     return base64.b64encode(buf.getvalue()).decode()
@@ -44,8 +40,7 @@ def process_image(img):
     return processed
 
 
-def add_text(history, text):
-    global last_frame
+def add_text(history, text, last_frame):
     if not text.strip():
         return history, "", None, "Whenever you're ready, just type a message — we're here to listen."
     if last_frame is None:
@@ -55,9 +50,9 @@ def add_text(history, text):
     return history, "", processed_image, "Photo automatically captured for emotion analysis"
 
 
-def bot(history):
+def bot(history, last_frame):
     user_message = history[-1][0]
-    image_b64 = _frame_to_b64()
+    image_b64 = _frame_to_b64(last_frame)
 
     if image_b64 is None:
         history[-1] = (user_message, "Could not capture webcam image. Please ensure your camera is active.")
@@ -140,13 +135,19 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
                 send_btn = gr.Button("Send", scale=1)
                 clear = gr.Button("Clear Chat", scale=1)
 
-    webcam.stream(update_frame, inputs=[webcam], outputs=None, show_progress=False)
+    # Per-session frame storage: prevents one user's webcam frame from
+    # leaking into another user's request in multi-user deployments.
+    frame_state = gr.State(None)
 
-    msg.submit(add_text, [chatbot, msg], [chatbot, msg, captured, status]).then(
-        bot, [chatbot], chatbot
+    webcam.stream(
+        update_frame, inputs=[webcam, frame_state], outputs=frame_state, show_progress=False
     )
-    send_btn.click(add_text, [chatbot, msg], [chatbot, msg, captured, status]).then(
-        bot, [chatbot], chatbot
+
+    msg.submit(add_text, [chatbot, msg, frame_state], [chatbot, msg, captured, status]).then(
+        bot, [chatbot, frame_state], chatbot
+    )
+    send_btn.click(add_text, [chatbot, msg, frame_state], [chatbot, msg, captured, status]).then(
+        bot, [chatbot, frame_state], chatbot
     )
     clear.click(lambda: [], outputs=[chatbot])
 

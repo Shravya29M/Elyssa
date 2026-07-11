@@ -20,9 +20,18 @@ RESPONSE_URL = os.getenv("RESPONSE_SERVICE_URL", "http://response-service:8003")
 
 _client: httpx.AsyncClient | None = None
 
-inference_breaker = CircuitBreaker("inference", failure_threshold=5, recovery_timeout=30)
-sentiment_breaker = CircuitBreaker("sentiment", failure_threshold=5, recovery_timeout=10)
-response_breaker = CircuitBreaker("response", failure_threshold=3, recovery_timeout=60)
+_CB_THRESHOLD = int(os.getenv("CIRCUIT_BREAKER_THRESHOLD", "5"))
+_CB_TIMEOUT = float(os.getenv("CIRCUIT_BREAKER_TIMEOUT", "30"))
+
+inference_breaker = CircuitBreaker(
+    "inference", failure_threshold=_CB_THRESHOLD, recovery_timeout=_CB_TIMEOUT
+)
+sentiment_breaker = CircuitBreaker(
+    "sentiment", failure_threshold=_CB_THRESHOLD, recovery_timeout=10
+)
+response_breaker = CircuitBreaker(
+    "response", failure_threshold=3, recovery_timeout=60
+)
 
 
 @asynccontextmanager
@@ -57,9 +66,7 @@ async def _call_inference_raw(image_b64: str, request_id: str) -> dict:
 
 async def call_inference(image_b64: str, request_id: str) -> dict:
     try:
-        return await inference_breaker.call(
-            _call_inference_raw(image_b64, request_id)
-        )
+        return await inference_breaker.call(_call_inference_raw, image_b64, request_id)
     except CircuitOpenError:
         log.warning("inference_circuit_open", request_id=request_id)
         return {"emotion": "neutral", "raw_response": "", "latency_ms": 0}
@@ -91,7 +98,7 @@ async def _call_sentiment_raw(facial_emotion: str, text: str, request_id: str) -
 async def call_sentiment(facial_emotion: str, text: str, request_id: str) -> dict:
     try:
         return await sentiment_breaker.call(
-            _call_sentiment_raw(facial_emotion, text, request_id)
+            _call_sentiment_raw, facial_emotion, text, request_id
         )
     except CircuitOpenError:
         log.warning("sentiment_circuit_open", request_id=request_id)
@@ -150,7 +157,10 @@ async def call_response(
     request_id: str,
 ) -> dict:
     return await response_breaker.call(
-        _call_response_raw(
-            user_text, facial_emotion, text_emotion, is_conflicting, request_id
-        )
+        _call_response_raw,
+        user_text,
+        facial_emotion,
+        text_emotion,
+        is_conflicting,
+        request_id,
     )

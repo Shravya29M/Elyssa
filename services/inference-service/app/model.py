@@ -2,7 +2,6 @@ import asyncio
 import os
 import re
 
-import torch
 from PIL import Image
 
 _model = None
@@ -22,11 +21,13 @@ def load_vision_model():
     if MOCK_MODELS:
         print("[MOCK] Vision model not loaded (MOCK_MODELS=true)")
         return
-    print("Loading emotion detection model (seasalt29/imageModelBig)...")
+    model_id = os.getenv("MODEL_ID", "seasalt29/imageModelBig")
+    load_in_4bit = os.getenv("LOAD_IN_4BIT", "true").lower() == "true"
+    print(f"Loading emotion detection model ({model_id})...")
     from unsloth import FastVisionModel  # noqa: PLC0415
     model, tokenizer = FastVisionModel.from_pretrained(
-        "seasalt29/imageModelBig",
-        load_in_4bit=True,
+        model_id,
+        load_in_4bit=load_in_4bit,
         use_gradient_checkpointing="unsloth",
     )
     FastVisionModel.for_inference(model)
@@ -101,3 +102,12 @@ def is_model_loaded() -> bool:
     if MOCK_MODELS:
         return True
     return _model is not None
+
+
+def gpu_available() -> bool:
+    try:
+        import torch  # noqa: PLC0415
+
+        return torch.cuda.is_available()
+    except ImportError:
+        return False

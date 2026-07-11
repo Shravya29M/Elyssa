@@ -28,7 +28,12 @@ class CircuitBreaker:
         self.state = CircuitState.CLOSED
         self._lock = asyncio.Lock()
 
-    async def call(self, coro):
+    async def call(self, func, *args, **kwargs):
+        """Run `await func(*args, **kwargs)` through the breaker.
+
+        Takes a callable rather than a coroutine so nothing is created
+        (and left un-awaited) when the circuit is open.
+        """
         async with self._lock:
             if self.state == CircuitState.OPEN:
                 if time.monotonic() - self.last_failure_time > self.recovery_timeout:
@@ -38,7 +43,7 @@ class CircuitBreaker:
                         f"Circuit '{self.name}' is OPEN — failing fast"
                     )
         try:
-            result = await coro
+            result = await func(*args, **kwargs)
             await self._on_success()
             return result
         except CircuitOpenError:

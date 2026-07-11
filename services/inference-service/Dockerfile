@@ -6,8 +6,10 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+# REQUIREMENTS=requirements-ci.txt builds a CPU-only image for mock/demo mode
+ARG REQUIREMENTS=requirements.txt
+COPY requirements.txt requirements-ci.txt ./
+RUN pip3 install --no-cache-dir -r ${REQUIREMENTS}
 
 COPY app/ ./app/
 

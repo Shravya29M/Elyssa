@@ -2,7 +2,6 @@ import os
 
 os.environ["MOCK_MODELS"] = "true"
 
-import pytest
 from app.prompt import create_prompt, parse_response
 
 

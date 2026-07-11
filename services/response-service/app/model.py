@@ -1,8 +1,6 @@
 import asyncio
 import os
 
-import torch
-
 _model = None
 _tokenizer = None
 _lock = asyncio.Lock()
@@ -15,11 +13,12 @@ def load_language_model():
     if MOCK_MODELS:
         print("[MOCK] Language model not loaded (MOCK_MODELS=true)")
         return
-    print("Loading counseling model (seasalt29/model3)...")
+    model_id = os.getenv("MODEL_ID", "seasalt29/model3")
+    print(f"Loading counseling model ({model_id})...")
     from unsloth import FastLanguageModel  # noqa: PLC0415
 
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name="seasalt29/model3",
+        model_name=model_id,
         max_seq_length=int(os.getenv("MAX_SEQ_LENGTH", "512")),
         dtype=None,
         load_in_4bit=False,
@@ -49,3 +48,12 @@ def is_model_loaded() -> bool:
     if MOCK_MODELS:
         return True
     return _model is not None
+
+
+def gpu_available() -> bool:
+    try:
+        import torch  # noqa: PLC0415
+
+        return torch.cuda.is_available()
+    except ImportError:
+        return False
