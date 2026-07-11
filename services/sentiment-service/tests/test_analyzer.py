@@ -33,3 +33,20 @@ def test_no_conflict_matching_emotions():
 def test_no_conflict_neutral():
     result = detect_conflict("neutral", "The weather is okay.")
     assert result["is_conflicting"] is False
+
+
+def test_mental_health_phrases_score_negative():
+    # Base VADER scores these mildly positive; the lexicon overlay fixes them
+    for text in (
+        "I've been feeling really down lately.",
+        "I'm feeling overwhelmed with my workload.",
+        "I'm so stressed and anxious about everything.",
+    ):
+        emotion, score = analyze_text_sentiment(text)
+        assert score < -0.1, text
+        assert emotion in ("sad", "anxious"), text
+
+
+def test_conflict_happy_face_feeling_down():
+    result = detect_conflict("happy", "I've been feeling really down lately.")
+    assert result["is_conflicting"] is True

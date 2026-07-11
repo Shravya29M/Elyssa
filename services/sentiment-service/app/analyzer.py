@@ -8,6 +8,28 @@ except LookupError:
 
 _sia = SentimentIntensityAnalyzer()
 
+# VADER's general-purpose lexicon misses common mental-health language:
+# "feeling down" and "overwhelmed" score as mildly positive out of the box.
+MENTAL_HEALTH_LEXICON = {
+    "down": -1.2,
+    "overwhelmed": -1.8,
+    "overwhelming": -1.5,
+    "stressed": -1.8,
+    "anxious": -1.9,
+    "anxiety": -1.6,
+    "lonely": -2.0,
+    "loneliness": -1.8,
+    "hopeless": -2.5,
+    "worthless": -2.5,
+    "numb": -1.5,
+    "drained": -1.5,
+    "exhausted": -1.6,
+    "burnout": -1.8,
+    "insomnia": -1.4,
+    "panic": -2.0,
+}
+_sia.lexicon.update(MENTAL_HEALTH_LEXICON)
+
 POSITIVE_EMOTIONS = {"happy", "excited"}
 NEGATIVE_EMOTIONS = {"sad", "angry", "fearful", "disgusted", "anxious", "tired"}
 NEUTRAL_EMOTIONS = {"neutral", "surprised", "confused"}

@@ -8,7 +8,8 @@ Elyssa is a production-grade, multi-modal AI mental health assistant that combin
 
 ## Try It
 
-- **🤗 Live demo** — Hugging Face Space (single-process build of the same pipeline): *coming soon — deploy from [`hf-space/`](hf-space/)*
+- **🌐 Live demo** — [elyssa.onrender.com](https://elyssa.onrender.com) — free-tier build with the real sentiment + conflict-detection pipeline (LLMs simulated; source in [`demo/`](demo/)). One-click redeploy: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Shravya29M/Elyssa)
+- **🤗 GPU demo** — full-model single-process build ready to deploy from [`hf-space/`](hf-space/) (needs an HF PRO / GPU Space)
 - **Run locally without a GPU** (full 5-service stack, mocked LLMs, ~2 min):
 
   ```bash
