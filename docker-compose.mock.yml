@@ -1,32 +1,27 @@
+# Full-stack demo without a GPU: all five services run, with the two
+# LLM services in MOCK_MODELS mode (canned responses, no model download).
+#
+#   docker compose -f docker-compose.mock.yml up --build
+#
+# Frontend: http://localhost:7860 · Gateway API: http://localhost:8000
 
 services:
   inference-service:
     build:
       context: ./services/inference-service
+      args:
+        REQUIREMENTS: requirements-ci.txt
     ports:
       - "8001:8001"
     environment:
-      MODEL_ID: seasalt29/imageModelBig
-      LOAD_IN_4BIT: "true"
-      MAX_NEW_TOKENS: "128"
-      INFERENCE_TEMPERATURE: "0.1"
+      MOCK_MODELS: "true"
       LOG_LEVEL: INFO
-      HF_HOME: /model-cache
-    volumes:
-      - model-cache:/model-cache
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
-      start_period: 120s
+      start_period: 10s
 
   sentiment-service:
     build:
@@ -45,29 +40,19 @@ services:
   response-service:
     build:
       context: ./services/response-service
+      args:
+        REQUIREMENTS: requirements-ci.txt
     ports:
       - "8003:8003"
     environment:
-      MODEL_ID: seasalt29/model3
-      MAX_SEQ_LENGTH: "512"
-      MAX_NEW_TOKENS: "512"
+      MOCK_MODELS: "true"
       LOG_LEVEL: INFO
-      HF_HOME: /model-cache
-    volumes:
-      - model-cache:/model-cache
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
-      start_period: 60s
+      start_period: 10s
 
   gateway:
     build:
@@ -103,7 +88,3 @@ services:
     depends_on:
       gateway:
         condition: service_healthy
-
-volumes:
-  model-cache:
-    driver: local
