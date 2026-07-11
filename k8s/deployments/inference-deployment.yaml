@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: inference-service
-          image: ghcr.io/your-org/elyssa-inference:latest
+          image: ghcr.io/shravya29m/elyssa-inference:latest
           ports:
             - containerPort: 8001
           envFrom:

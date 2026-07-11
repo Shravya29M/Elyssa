@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: response-service
-          image: ghcr.io/your-org/elyssa-response:latest
+          image: ghcr.io/shravya29m/elyssa-response:latest
           ports:
             - containerPort: 8003
           envFrom:

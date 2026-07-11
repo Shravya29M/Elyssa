@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/your-org/elyssa-frontend:latest
+          image: ghcr.io/shravya29m/elyssa-frontend:latest
           ports:
             - containerPort: 7860
           envFrom:

@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: sentiment-service
-          image: ghcr.io/your-org/elyssa-sentiment:latest
+          image: ghcr.io/shravya29m/elyssa-sentiment:latest
           ports:
             - containerPort: 8002
           envFrom:

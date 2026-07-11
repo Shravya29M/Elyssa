@@ -6,6 +6,19 @@ Elyssa is a production-grade, multi-modal AI mental health assistant that combin
 
 ---
 
+## Try It
+
+- **🤗 Live demo** — Hugging Face Space (single-process build of the same pipeline): *coming soon — deploy from [`hf-space/`](hf-space/)*
+- **Run locally without a GPU** (full 5-service stack, mocked LLMs, ~2 min):
+
+  ```bash
+  git clone https://github.com/Shravya29M/Elyssa.git && cd Elyssa
+  docker compose -f docker-compose.mock.yml up --build
+  # open http://localhost:7860
+  ```
+
+---
+
 ## Architecture
 
 ```
@@ -56,13 +69,13 @@ Every chat message follows this pipeline:
 ```
 POST /chat (image_b64 + user_text)
   │
-  ├─ 1. Inference Service  → facial_emotion       (30s timeout, 2 retries)
+  ├─ 1. Inference Service  → facial_emotion       (30s timeout, 2 attempts)
   │
-  ├─ 2. Sentiment Service  → conflict detection   (5s timeout, 3 retries)
+  ├─ 2. Sentiment Service  → conflict detection   (5s timeout, 3 attempts)
   │       ├─ NLTK VADER text sentiment
   │       └─ Conflict: face vs text emotion mismatch
   │
-  └─ 3. Response Service   → counseling response  (60s timeout, 1 retry)
+  └─ 3. Response Service   → counseling response  (60s timeout, 1 attempt)
           ├─ Alpaca-format prompt with emotion context
           └─ Fine-tuned Llama-3.2-3B generation (up to 512 tokens)
 ```
@@ -92,6 +105,14 @@ POST /chat (image_b64 + user_text)
 |---|---|---|---|
 | Emotion Detection | [seasalt29/imageModelBig](https://huggingface.co/seasalt29/imageModelBig) | Llama-3.2-11B-Vision-Instruct | Tukey Human Emotion Dataset |
 | Mental Health LLM | [seasalt29/model3](https://huggingface.co/seasalt29/model3) | Llama-3.2-3B | MentalChat16K |
+
+### Evaluation
+
+Fine-tuning the counseling model on MentalChat16K improved response quality by
+**10.46% ROUGE F1** over the base Llama-3.2-3B model on a held-out evaluation
+set. Training and evaluation notebooks: [`Model3.ipynb`](Model3.ipynb)
+(counseling LLM) and [`FER_MODEL_LATEST.ipynb`](FER_MODEL_LATEST.ipynb)
+(facial emotion recognition).
 
 ---
 
@@ -177,8 +198,8 @@ curl http://localhost:8001/metrics  # Prometheus text format
 ### Run all services
 
 ```bash
-git clone https://github.com/your-org/elyssa.git
-cd elyssa
+git clone https://github.com/Shravya29M/Elyssa.git
+cd Elyssa
 docker compose up --build
 ```
 
@@ -193,8 +214,11 @@ Services available at:
 
 ### Run without GPU (mock mode)
 
+Runs the full 5-service stack on any machine — the two LLM services return
+canned responses instead of loading model weights (no GPU, no 22GB download):
+
 ```bash
-MOCK_MODELS=true docker compose up --build sentiment-service gateway
+docker compose -f docker-compose.mock.yml up --build
 ```
 
 ### Run tests
@@ -304,6 +328,7 @@ elyssa/
 │   ├── response-service/      # Port 8003 — Counseling LLM generation
 │   └── gateway/               # Port 8000 — Async orchestrator + circuit breaker
 ├── frontend/                  # Port 7860 — Gradio webcam + chat UI
+├── hf-space/                  # Hugging Face Space demo build (single process)
 ├── k8s/
 │   ├── namespace.yaml
 │   ├── configmaps/            # Per-service environment configuration
