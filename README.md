@@ -124,6 +124,15 @@ template, greedy decoding, fixed seed. Reproducible script and full results:
 Fine-tuning moved word choice measurably closer to real counselor responses
 (ROUGE-1); phrase-level metrics were flat to slightly lower, which is expected
 when a model stops parroting prompt phrasing and answers in its own words.
+
+Because ROUGE poorly captures counseling quality, the same 100 response pairs
+were also judged blind by GPT-5.1 (randomized A/B order to control position
+bias; judge instructed to ignore length): **the fine-tuned model was preferred
+in 79 of 100 comparisons** (no ties, no invalid verdicts; the fine-tune sat in
+position A 57 times while A won 64 times, so the margin is not position bias).
+Script, full generations, and per-pair verdicts:
+[`eval/llm_judge.py`](eval/llm_judge.py), [`eval/generations.json`](eval/generations.json),
+[`eval/judge_results.json`](eval/judge_results.json).
 Training notebooks: [`Model3.ipynb`](Model3.ipynb) (counseling LLM) and
 [`FER_MODEL_LATEST.ipynb`](FER_MODEL_LATEST.ipynb) (facial emotion recognition).
 

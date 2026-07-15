@@ -1,0 +1,615 @@
+{
+  "judge_model": "gpt-5.1",
+  "n": 100,
+  "wins": {
+    "finetuned": 79,
+    "base": 21,
+    "tie": 0,
+    "invalid": 0
+  },
+  "finetuned_win_rate_incl_ties": 0.79,
+  "finetuned_win_rate_of_decided": 0.79,
+  "position_randomization_seed": 3407,
+  "records": [
+    {
+      "i": 0,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 1,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 2,
+      "ft_is_a": true,
+      "verdict": "B",
+      "winner": "base"
+    },
+    {
+      "i": 3,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 4,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 5,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 6,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 7,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 8,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 9,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 10,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 11,
+      "ft_is_a": true,
+      "verdict": "B",
+      "winner": "base"
+    },
+    {
+      "i": 12,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 13,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 14,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 15,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 16,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 17,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 18,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 19,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 20,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 21,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 22,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 23,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 24,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 25,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 26,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 27,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 28,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 29,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 30,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 31,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 32,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 33,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 34,
+      "ft_is_a": true,
+      "verdict": "B",
+      "winner": "base"
+    },
+    {
+      "i": 35,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 36,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 37,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 38,
+      "ft_is_a": true,
+      "verdict": "B",
+      "winner": "base"
+    },
+    {
+      "i": 39,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 40,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 41,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 42,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 43,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 44,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 45,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 46,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 47,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 48,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 49,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 50,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 51,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 52,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 53,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 54,
+      "ft_is_a": true,
+      "verdict": "B",
+      "winner": "base"
+    },
+    {
+      "i": 55,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 56,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 57,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 58,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 59,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 60,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 61,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 62,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 63,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 64,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 65,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 66,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 67,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 68,
+      "ft_is_a": true,
+      "verdict": "B",
+      "winner": "base"
+    },
+    {
+      "i": 69,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 70,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 71,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 72,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 73,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 74,
+      "ft_is_a": true,
+      "verdict": "B",
+      "winner": "base"
+    },
+    {
+      "i": 75,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 76,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 77,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 78,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 79,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 80,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 81,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 82,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 83,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 84,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 85,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 86,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 87,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 88,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 89,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 90,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 91,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 92,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 93,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 94,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 95,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 96,
+      "ft_is_a": false,
+      "verdict": "A",
+      "winner": "base"
+    },
+    {
+      "i": 97,
+      "ft_is_a": false,
+      "verdict": "B",
+      "winner": "finetuned"
+    },
+    {
+      "i": 98,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    },
+    {
+      "i": 99,
+      "ft_is_a": true,
+      "verdict": "A",
+      "winner": "finetuned"
+    }
+  ]
+}
