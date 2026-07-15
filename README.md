@@ -109,11 +109,23 @@ POST /chat (image_b64 + user_text)
 
 ### Evaluation
 
-Fine-tuning the counseling model on MentalChat16K improved response quality by
-**10.46% ROUGE F1** over the base Llama-3.2-3B model on a held-out evaluation
-set. Training and evaluation notebooks: [`Model3.ipynb`](Model3.ipynb)
-(counseling LLM) and [`FER_MODEL_LATEST.ipynb`](FER_MODEL_LATEST.ipynb)
-(facial emotion recognition).
+The counseling model was evaluated against its base model on 100 prompts from
+[Amod/mental_health_counseling_conversations](https://huggingface.co/datasets/Amod/mental_health_counseling_conversations)
+(real counselor answers, unseen during training), identical alpaca prompt
+template, greedy decoding, fixed seed. Reproducible script and full results:
+[`eval/rouge_eval.py`](eval/rouge_eval.py), [`eval/rouge_results.json`](eval/rouge_results.json).
+
+| ROUGE F1 | Base Llama-3.2-3B | Fine-tuned (model3) | Change |
+|---|---|---|---|
+| ROUGE-1 | 0.3008 | 0.3150 | **+4.7%** |
+| ROUGE-2 | 0.0472 | 0.0446 | -5.4% |
+| ROUGE-L | 0.1528 | 0.1479 | -3.2% |
+
+Fine-tuning moved word choice measurably closer to real counselor responses
+(ROUGE-1); phrase-level metrics were flat to slightly lower, which is expected
+when a model stops parroting prompt phrasing and answers in its own words.
+Training notebooks: [`Model3.ipynb`](Model3.ipynb) (counseling LLM) and
+[`FER_MODEL_LATEST.ipynb`](FER_MODEL_LATEST.ipynb) (facial emotion recognition).
 
 ---
 
