@@ -36,7 +36,8 @@ def test_no_conflict_neutral():
 
 
 def test_mental_health_phrases_score_negative():
-    # Base VADER scores these mildly positive; the lexicon overlay fixes them
+    # Base VADER scores the first two mildly positive ("down" is not in its
+    # lexicon, "overwhelmed" is +0.2); the lexicon overlay makes all three negative
     for text in (
         "I've been feeling really down lately.",
         "I'm feeling overwhelmed with my workload.",
