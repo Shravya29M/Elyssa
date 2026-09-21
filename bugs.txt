@@ -1,0 +1,20 @@
+Audit Findings
+Critical: real vision inference can misclassify every face as happy. The decoder searches the full generated sequence, including the instruction that lists happy first; if the assistant-marker parsing fails, it returns the first emotion found in that prompt. Decode only tokens after the input length. [model.py (line 77)](services/inference-service/app/model.py:77)
+
+High: the public URL does not demonstrate the claimed system. Render deploys [`demo/` (line 1)](demo/app.py:1), which duplicates sentiment/conflict logic and uses a dropdown plus templated replies. It is clearly labelled, which is good, but it is not evidence that the five-service Kubernetes/GPU system works end-to-end. [render.yaml (line 1)](render.yaml:1)
+
+High: CI publishes images but does not deploy them. Kubernetes references mutable :latest tags; Kubernetes may retain the cached image, and CI has no rollout/GitOps step. A successful CI run therefore does not prove the cluster is running the latest version. Pin image digests or commit SHA tags and add a deployment step. [ci.yml (line 75)](.github/workflows/ci.yml:75) [gateway deployment (line 25)](k8s/deployments/gateway-deployment.yaml:25)
+
+High: GPU model startup is fragile. Large model downloads/loading can exceed the liveness windows and cause restarts; a startupProbe is needed so liveness checks do not kill a legitimately loading pod. [inference deployment (line 43)](k8s/deployments/inference-deployment.yaml:43) [response deployment (line 43)](k8s/deployments/response-deployment.yaml:43)
+
+Medium: the circuit breaker allows an unlimited half-open stampede. After recovery timeout, concurrent requests all see HALF_OPEN and call the failed service; one success can also close the breaker while other probes fail. Allow only one probe while half-open. [circuit_breaker.py (line 26)](services/gateway/app/circuit_breaker.py:26)
+
+Medium: the “latency-reducing routing” claim is not yet demonstrated. The gateway awaits vision inference before beginning sentiment/conflict detection, although text sentiment can run independently. There is also no load test or latency benchmark in the repo. [main.py (line 45)](services/gateway/app/main.py:45)
+
+Medium: public mental-health use needs safety controls. There is no crisis/self-harm detection, emergency guidance, rate limit, request-size limits, or reliable user-facing non-clinical disclaimer. The API also returns raw exception text to callers. [main.py (line 130)](services/gateway/app/main.py:130) [schemas.py (line 7)](services/gateway/app/schemas.py:7)
+
+Medium: ingress is not deploy-ready as written. It uses regex capture groups and a rewrite target but lacks the NGINX use-regex annotation; it also has the placeholder host elyssa.example.com and no TLS configuration. [ingress.yaml (line 6)](k8s/ingress/ingress.yaml:6)
+
+Medium: quality claims are not reproducible from the repository. The README states a 10.46% ROUGE F1 improvement, but there is no versioned evaluation dataset/split, evaluation command, metrics artifact, or CI check. The operational sentiment service is VADER plus a hand-maintained lexicon, not a fine-tuned sentiment LLM. [README.md (line 95)](README.md:95) [analyzer.py (line 11)](services/sentiment-service/app/analyzer.py:11)
+
+Low: tests are mostly unit/mock coverage. There is no gateway API integration test, no compose E2E test, no failure-mode test across service boundaries, no load/performance test, and no real-model smoke test. The existing tests will not catch the vision-token decoding bug.
