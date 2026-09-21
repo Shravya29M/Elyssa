@@ -1,0 +1,117 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    "security:openssf-scorecard",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "timezone": "America/New_York",
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "labels": [
+    "dependencies"
+  ],
+  "rangeStrategy": "bump",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "before 6am on monday"
+    ]
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "security"
+    ],
+    "schedule": [
+      "at any time"
+    ],
+    "prPriority": 10
+  },
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "description": "Group all GitHub Actions bumps into one PR and automerge them.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "github-actions",
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Automerge non-major dev/test tooling once CI is green.",
+      "matchDepTypes": [
+        "devDependencies",
+        "dev",
+        "test"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Patch bumps of runtime deps are low risk; group them.",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "groupName": "patch dependencies"
+    },
+    {
+      "description": "Major bumps always get a standalone PR and a human review.",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false,
+      "addLabels": [
+        "major-update"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Let a release sit briefly before proposing it, to dodge yanked versions.",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Model/GPU stack is pinned to what the trained checkpoints were built against; propose but never automerge.",
+      "matchPackageNames": [
+        "unsloth",
+        "torch",
+        "transformers",
+        "nltk",
+        "Pillow"
+      ],
+      "groupName": null,
+      "automerge": false,
+      "addLabels": [
+        "ml-stack"
+      ],
+      "minimumReleaseAge": "14 days"
+    },
+    {
+      "description": "The four services share a FastAPI/observability baseline \u2014 bump them together so the stack stays consistent.",
+      "matchPackageNames": [
+        "fastapi",
+        "uvicorn",
+        "httpx",
+        "pydantic",
+        "structlog",
+        "prometheus-client",
+        "tenacity"
+      ],
+      "groupName": "service baseline (fastapi + observability)"
+    }
+  ]
+}

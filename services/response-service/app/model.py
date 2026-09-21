@@ -8,11 +8,14 @@ _lock = asyncio.Lock()
 MOCK_MODELS = os.getenv("MOCK_MODELS", "false").lower() == "true"
 
 
-def load_language_model():
+def _load_real_language_model() -> None:  # pragma: no cover - needs a GPU host
+    """Pull the fine-tuned counselling model onto the GPU.
+
+    Split out of `load_language_model` because it needs CUDA and the unsloth
+    stack, neither of which exists in CI; keeping it separate lets the
+    mock-mode branch be measured honestly.
+    """
     global _model, _tokenizer
-    if MOCK_MODELS:
-        print("[MOCK] Language model not loaded (MOCK_MODELS=true)")
-        return
     model_id = os.getenv("MODEL_ID", "seasalt29/model3")
     print(f"Loading counseling model ({model_id})...")
     from unsloth import FastLanguageModel  # noqa: PLC0415
@@ -29,13 +32,23 @@ def load_language_model():
     print("Language model loaded successfully.")
 
 
-def _sync_generate(prompt: str, max_new_tokens: int) -> str:
+def load_language_model():
     if MOCK_MODELS:
-        return "### Response:\nI hear you and I'm here to help. [mock response]"
+        print("[MOCK] Language model not loaded (MOCK_MODELS=true)")
+        return
+    _load_real_language_model()
 
+
+def _run_real_generation(prompt: str, max_new_tokens: int) -> str:  # pragma: no cover - needs a GPU host
     inputs = _tokenizer([prompt], return_tensors="pt").to("cuda")
     output = _model.generate(**inputs, max_new_tokens=max_new_tokens, use_cache=True)
     return _tokenizer.decode(output[0])
+
+
+def _sync_generate(prompt: str, max_new_tokens: int) -> str:
+    if MOCK_MODELS:
+        return "### Response:\nI hear you and I'm here to help. [mock response]"
+    return _run_real_generation(prompt, max_new_tokens)
 
 
 async def generate(prompt: str, max_new_tokens: int = 512) -> str:

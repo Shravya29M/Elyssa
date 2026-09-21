@@ -1,0 +1,6 @@
+[report]
+exclude_also =
+    # Loading the fine-tuned weights and running CUDA inference need a GPU
+    # host and the unsloth stack; those paths are split into their own
+    # functions and exercised on the GPU deployment, not in CI.
+    pragma: no cover

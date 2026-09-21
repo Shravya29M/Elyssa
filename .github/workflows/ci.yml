@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ${{ github.repository_owner }}/elyssa
@@ -54,20 +58,29 @@ jobs:
           else
             pip install -r requirements.txt
           fi
-          pip install ruff pytest pytest-asyncio httpx
+          pip install ruff pytest pytest-asyncio pytest-cov httpx
 
       - name: Lint with ruff
         run: |
           cd ${{ matrix.context }}
           ruff check . --select E,F,W,I --ignore E501
 
-      - name: Run tests
+      - name: Run tests with coverage
         if: matrix.service != 'frontend'
         env:
           MOCK_MODELS: "true"
         run: |
           cd ${{ matrix.context }}
+          # Coverage reporting and the per-service floor live in pytest.ini.
           python -m pytest tests/ -v --tb=short
+
+      - name: Upload coverage
+        if: always() && matrix.service != 'frontend'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.service }}
+          path: ${{ matrix.context }}/coverage.xml
+          retention-days: 7
 
   build-and-push:
     name: Build & Push — ${{ matrix.image }}

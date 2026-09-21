@@ -16,15 +16,19 @@ EMOTION_WORDS = [
 ]
 
 
-def load_vision_model():
+def _load_real_vision_model() -> None:  # pragma: no cover - needs a GPU host
+    """Pull the fine-tuned vision model onto the GPU.
+
+    Split out of `load_vision_model` because it needs CUDA and the unsloth
+    stack, neither of which exists in CI; keeping it separate lets the
+    mock-mode branch be measured honestly.
+    """
     global _model, _tokenizer
-    if MOCK_MODELS:
-        print("[MOCK] Vision model not loaded (MOCK_MODELS=true)")
-        return
     model_id = os.getenv("MODEL_ID", "seasalt29/imageModelBig")
     load_in_4bit = os.getenv("LOAD_IN_4BIT", "true").lower() == "true"
     print(f"Loading emotion detection model ({model_id})...")
     from unsloth import FastVisionModel  # noqa: PLC0415
+
     model, tokenizer = FastVisionModel.from_pretrained(
         model_id,
         load_in_4bit=load_in_4bit,
@@ -36,11 +40,43 @@ def load_vision_model():
     print("Vision model loaded successfully.")
 
 
-def _sync_detect(image: Image.Image) -> tuple[str, str]:
-    """Blocking inference — call via run_in_executor."""
+def load_vision_model():
     if MOCK_MODELS:
-        return "neutral", "[mock response]"
+        print("[MOCK] Vision model not loaded (MOCK_MODELS=true)")
+        return
+    _load_real_vision_model()
 
+
+def extract_emotion(decoded: str) -> tuple[str, str]:
+    """Pull a single emotion word out of a raw model decode.
+
+    Split out of `_sync_detect` so it can be tested without a GPU: this is
+    where the model's free-form text gets forced back onto the fixed label
+    set, and it is the part most likely to drift.
+
+    Returns (emotion, cleaned_decode); falls back to "neutral" when no known
+    emotion word appears.
+    """
+    cleaned = re.sub(r"<\|.*?\|>", "", decoded).strip().lower()
+
+    # Chat templates echo the prompt, which itself lists every emotion word.
+    # Only the text after the assistant turn reflects the model's answer.
+    assistant_response = ""
+    if "assistant" in cleaned:
+        parts = cleaned.split("assistant")
+        if len(parts) > 1:
+            assistant_response = parts[1].strip()
+
+    text_to_search = assistant_response if assistant_response else cleaned
+
+    for word in EMOTION_WORDS:
+        if re.search(r"\b" + word + r"\b", text_to_search):
+            return word, cleaned
+
+    return "neutral", cleaned
+
+
+def _run_real_inference(image: Image.Image) -> tuple[str, str]:  # pragma: no cover - needs a GPU host
     from transformers import TextStreamer  # noqa: PLC0415
 
     instruction = (
@@ -74,22 +110,14 @@ def _sync_detect(image: Image.Image) -> tuple[str, str]:
         min_p=0.05,
     )
 
-    decoded = _tokenizer.decode(output[0])
-    cleaned = re.sub(r"<\|.*?\|>", "", decoded).strip().lower()
+    return extract_emotion(_tokenizer.decode(output[0]))
 
-    assistant_response = ""
-    if "assistant" in cleaned:
-        parts = cleaned.split("assistant")
-        if len(parts) > 1:
-            assistant_response = parts[1].strip()
 
-    text_to_search = assistant_response if assistant_response else cleaned
-
-    for word in EMOTION_WORDS:
-        if re.search(r"\b" + word + r"\b", text_to_search):
-            return word, cleaned
-
-    return "neutral", cleaned
+def _sync_detect(image: Image.Image) -> tuple[str, str]:
+    """Blocking inference — call via run_in_executor."""
+    if MOCK_MODELS:
+        return "neutral", "[mock response]"
+    return _run_real_inference(image)
 
 
 async def detect_emotion(image: Image.Image) -> tuple[str, str]:

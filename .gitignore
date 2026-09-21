@@ -5,3 +5,8 @@ __pycache__/
 venv/
 .venv/
 .DS_Store
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/
