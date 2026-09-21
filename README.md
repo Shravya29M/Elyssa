@@ -1,5 +1,10 @@
 # Elyssa – AI Mental Health Assistant
 
+[![CI](https://github.com/Shravya29M/Elyssa/actions/workflows/ci.yml/badge.svg)](https://github.com/Shravya29M/Elyssa/actions/workflows/ci.yml)
+![coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)
+![Python](https://img.shields.io/badge/python-3.10-3776AB?logo=python&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-ready-326CE5?logo=kubernetes&logoColor=white)
+
 > Indian Patent No. 202541093582A
 
 Elyssa is a production-grade, multi-modal AI mental health assistant that combines real-time facial emotion detection with text sentiment analysis to deliver empathetic, context-aware counseling responses. The system is architected as independently scalable microservices deployed on Kubernetes.
@@ -330,13 +335,54 @@ All services emit JSON logs with `request_id` for distributed tracing:
 
 ---
 
+## Tests
+
+**157 tests, 97% branch coverage**, enforced per service in CI. Each service declares its own
+floor in its `pytest.ini`, so coverage cannot quietly regress.
+
+| Service | Tests | Coverage |
+| --- | ---: | ---: |
+| gateway | 54 | 99% |
+| inference-service | 41 | 95% |
+| response-service | 36 | 95% |
+| sentiment-service | 26 | 100% |
+
+```bash
+cd services/gateway && MOCK_MODELS=true pytest
+```
+
+The gateway carries the most weight because it holds every resilience rule in the system. Its
+suite covers the retry count per downstream service, the circuit breaker trip / half-open /
+reopen cycle, fail-fast without a network call once a breaker is open, the neutral fallbacks
+that let a chat request complete when emotion detection or sentiment is down, and response
+failures propagating rather than degrading (there is no safe neutral default for a counselling
+reply). `/chat` returning **503 rather than 500** on an open breaker is asserted explicitly:
+a tripped breaker is a retryable outage, not a bug.
+
+The other three cover their endpoint contracts, conflict detection across emotion categories,
+prompt construction and response parsing, and the generation lock that serialises concurrent
+requests onto a single GPU.
+
+Everything runs with `MOCK_MODELS=true`. The paths that genuinely need CUDA and the unsloth
+stack are split into their own functions (`_load_real_vision_model`, `_run_real_inference`,
+`_run_real_generation`) and excluded from coverage, so the mock branches CI actually executes
+are measured honestly rather than hidden behind a blanket pragma. `extract_emotion` — which
+forces the vision model's free-form text back onto the fixed label set — was pulled out of the
+CUDA path specifically so it could be tested without a GPU.
+
 ## CI/CD
 
 GitHub Actions (`.github/workflows/ci.yml`):
 
-1. **Lint & Test** — ruff + pytest (with `MOCK_MODELS=true`) for all services in parallel
+1. **Lint & Test** — ruff + pytest with coverage (`MOCK_MODELS=true`) for all services in
+   parallel; each service fails under its own coverage floor
 2. **Build & Push** — Docker images pushed to GHCR on merge to `main`
-3. **Validate K8s** — `kubectl apply --dry-run=client` on all manifests
+3. **Validate K8s** — `kubeconform` against all manifests
+
+Dependency updates come through Renovate (`renovate.json`). The shared FastAPI and
+observability baseline is grouped so the four services stay in lockstep; the pinned model
+stack (unsloth, torch, transformers) is held back from automerge, since the checkpoints were
+trained against specific versions.
 
 ---
 
